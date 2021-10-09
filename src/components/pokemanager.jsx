@@ -1,93 +1,83 @@
-import React, { Component } from 'react';
+import { useState, useEffect } from 'react';
 import PokemonDetails from './pokemondetails';
 
 import '../component-styles/leftscrollbar.css';
 import '../component-styles/pokemanager.css';
 
-class PokeManager extends Component {
+const PokeManager = () => {
 
-    state = {
-        pokemons: [],
-        selectedPokemon: {
-            abilities: []
-        },
-        selectedImgUrl: "",
-        lastLimit: 0,
-        lastOffset: 100,
-        total: 0,
-        catched: [],
-        onlyCatched: false
-    };
+    
+        const [pokemons, setPokemons] = useState([]);
+        const [selectedPokemon, setSelectedPokemon] = useState({abilities: []});
+        const [selectedImgUrl, setSelectedImgUrl] = useState(""); 
+        const [lastLimit, setLastLimit] = useState(0);
+        const [lastOffset, setLastOffset] = useState(100);
+        const [total, setTotal] = useState(0);
+        const [catched, setCatched] = useState([]);
+        const [onlyCatched, setOnlyCatched] = useState(false);
+   
 
-    componentDidMount() {
-        fetch("https://pokeapi.co/api/v2/pokemon?limit=" + this.state.lastLimit + "&offset=" + this.state.lastOffset)
+    useEffect(() => {
+        fetch("https://pokeapi.co/api/v2/pokemon?limit=" + lastLimit + "&offset=" + lastOffset)
         .then(res => res.json())
         .then(payload => {
             fetch(payload.results[0].url)
             .then(res2 => res2.json())
             .then(pokemonDetails => {
-                this.setState({
-                    pokemons: payload.results,
-                    selectedPokemon: pokemonDetails,
-                    selectedImgUrl: pokemonDetails.sprites.front_default,
-                    total: payload.count
-                });
+                setPokemons(payload.results);
+                setSelectedPokemon(pokemonDetails);
+                setSelectedImgUrl(pokemonDetails.sprites.front_default);
+                setTotal(payload.count);
             })
         })
-    }
+    }, []);
 
-    leftBarClickHandler(pokemonUrl) {
+    const leftBarClickHandler = function (pokemonUrl) {
         fetch(pokemonUrl)
         .then(res => res.json())
         .then(payload => {
-            this.setState({
-                selectedPokemon: payload,
-                selectedImgUrl: payload.sprites.front_default
-            })
+            setSelectedPokemon(payload);
+            setSelectedImgUrl(payload.sprites.front_default);
         })
     };
 
-    backward() {
-        const newLimit = Math.max(this.state.lastLimit - 100, 0);
-        const newOffset = Math.max(this.state.lastOffset - 100, 100);
+    const backward = function() {
+        const newLimit = Math.max(lastLimit - 100, 0);
+        const newOffset = Math.max(lastOffset - 100, 100);
         fetch("https://pokeapi.co/api/v2/pokemon?limit=" + newLimit + "&offset=" + newOffset)
         .then(res => res.json())
         .then(payload => {
             fetch(payload.results[0].url)
             .then(res2 => res2.json())
             .then(pokemonDetails => {
-                this.setState({
-                    pokemons: payload.results,
-                    selectedPokemon: pokemonDetails,
-                    selectedImgUrl: pokemonDetails.sprites.front_default,
-                    lastLimit: newLimit,
-                    lastOffset: newOffset
-                });
+                setPokemons(payload.results);
+                setSelectedPokemon(pokemonDetails);
+                setSelectedImgUrl(pokemonDetails.sprites.front_default);
+                setLastLimit(newLimit);
+                setLastOffset(newOffset);
             })
         })
     }
 
-    forward() {
-        const newLimit = Math.min(this.state.lastLimit + 100, this.state.total - 101);
-        const newOffset = Math.min(this.state.lastOffset + 100, this.state.total - 1);
+    const forward = function() {
+        const newLimit = Math.min(lastLimit + 100, total - 101);
+        const newOffset = Math.min(lastOffset + 100, total - 1);
         fetch("https://pokeapi.co/api/v2/pokemon?limit=" + newLimit + "&offset=" + newOffset)
         .then(res => res.json())
         .then(payload => {
             fetch(payload.results[0].url)
             .then(res2 => res2.json())
             .then(pokemonDetails => {
-                this.setState({
-                    pokemons: payload.results,
-                    selectedPokemon: pokemonDetails,
-                    selectedImgUrl: pokemonDetails.sprites.front_default,
-                    lastLimit: newLimit,
-                    lastOffset: newOffset
-                });
+                setPokemons(payload.results);
+                setSelectedPokemon(pokemonDetails);
+                setSelectedImgUrl(pokemonDetails.sprites.front_default);
+                setLastLimit(newLimit);
+                setLastOffset(newOffset);
             })
         })
     }
 
-    search() {
+    const search = function() {
         const searchName = document.getElementById("search-field").value;
         fetch("https://pokeapi.co/api/v2/pokemon/" + searchName)
         .then(res => res.json())
@@ -96,69 +86,62 @@ class PokeManager extends Component {
                 form.url = form.url.replace(/-form/,"");
                 return form;
             });
-            this.setState({
-                pokemons: pokemons,
-                selectedImgUrl: payload.sprites.front_default,
-                selectedPokemon: payload
-            });
+            setPokemons(pokemons);
+            setSelectedPokemon(payload);
+            setSelectedImgUrl(payload.sprites.front_default);
         })
     }
 
-    onCatched(name) {
-        let catched = this.state.catched;
+    const onCatched = function(name) {
+        let alreadyCatched = catched;
         if (document.getElementById("check_" + name).checked) {
-            catched.push(name);
+            alreadyCatched.push(name);
         }
         else {
-            catched = catched.filter(pokemonName => pokemonName !== name)
-            if (this.state.onlyCatched) {
-                this.setTheFirstCatchedAsSelected();
+            alreadyCatched = alreadyCatched.filter(pokemonName => pokemonName !== name)
+            if (onlyCatched) {
+                setTheFirstCatchedAsSelected();
             }
         }
-        this.setState({
-            catched: catched
-        });
+        setCatched(alreadyCatched);
     }
 
-    toggleCatched() {
-        this.setState({
-            onlyCatched: !this.state.onlyCatched
-        });
-        this.setTheFirstCatchedAsSelected();
+    const toggleCatched = function() {
+        setOnlyCatched(!onlyCatched)
+        setTheFirstCatchedAsSelected();
     }
 
-    setTheFirstCatchedAsSelected() {
+    const setTheFirstCatchedAsSelected = function() {
         const checkPokemons = document.querySelectorAll("input:checked");
         if (checkPokemons.length > 0) {
             checkPokemons[0].parentElement.parentElement.click();
         }
     }
 
-    renderPokemonDetails() {
-        if (!this.state.onlyCatched || this.state.catched.includes(this.state.selectedPokemon.forms[0].name))
-        return (<React.Fragment>
+    const renderPokemonDetails = function() {
+        if (!onlyCatched || catched.includes(selectedPokemon.forms[0].name))
+        return (<div>
                    <div className="col-md-12">
-                       <img alt="poke_front" src={this.state.selectedImgUrl} />
+                       <img alt="poke_front" src={selectedImgUrl} />
                    </div>
-                   <div className="col-md-12"><PokemonDetails selectedPokemon={this.state.selectedPokemon} /></div>
-               </React.Fragment>);
+                   <div className="col-md-12"><PokemonDetails selectedPokemon={selectedPokemon} /></div>
+               </div>);
 
         return "";
     }
-
-    render() { 
-        return (
-            <React.Fragment>
+    
+    return (
+            <div>
                 <nav className="navbar navbar-light bg-danger rounded-top row">
-                    <a className="navbar-brand" href="#"><img onClick={() => this.toggleCatched()} href="#" src="https://icon-library.com/images/pokedex-icon/pokedex-icon-21.jpg" alt="Pokedex" /></a>
+                    <a className="navbar-brand" href="#"><img onClick={() => toggleCatched()} href="#" src="https://icon-library.com/images/pokedex-icon/pokedex-icon-21.jpg" alt="Pokedex" /></a>
                 </nav>
                 <nav className="row navbar navbar-light bg-danger">
                     <div className="col-md-7 row">
-                        <div className="col-md-1"><a onClick={() => this.backward()} className="btn btn-warning">Prev</a></div>
-                        <div className="col-md-11"><a onClick={() => this.forward()} className="btn btn-warning">Next</a></div>
+                        <div className="col-md-1"><a onClick={() => backward()} className="btn btn-warning">Prev</a></div>
+                        <div className="col-md-11"><a onClick={() => forward()} className="btn btn-warning">Next</a></div>
                     </div>
                     <div className="col-md-3"><input id="search-field" type="search" placeholder="Search" aria-label="Search" /></div>
-                    <div className="col-md-2"><button className="btn btn-warning" onClick={() => this.search()}>Search</button></div>
+                    <div className="col-md-2"><button className="btn btn-warning" onClick={() => search()}>Search</button></div>
                 </nav>
                 <div className="App row">
                     <div className="col-md-4 row">
@@ -166,22 +149,22 @@ class PokeManager extends Component {
                         <div id="leftScrollbar" className="overflow-auto">
                             <div className="list-group">
                                 {
-                                    this.state.pokemons
+                                    pokemons
                                     .filter(pokemon => {
-                                        if (!this.state.onlyCatched) return true;
-                                        return this.state.catched.indexOf(pokemon.name) != -1
+                                        if (!onlyCatched) return true;
+                                        return catched.indexOf(pokemon.name) != -1
                                     })
                                     .map(
-                                        pokemon => <React.Fragment key={pokemon.name}>
-                                                        <div className="list-group-item list-group-item-action hand-cursor" onClick={() => this.leftBarClickHandler(pokemon.url)}>
+                                        pokemon => <div key={pokemon.name}>
+                                                        <div className="list-group-item list-group-item-action hand-cursor" onClick={() => leftBarClickHandler(pokemon.url)}>
                                                         <div className="form-check">
-                                                            <input className="form-check-input" type="checkbox" value="catched" id={"check_" + pokemon.name} checked={this.state.catched.includes(pokemon.name)} onChange={() => this.onCatched(pokemon.name)} />
+                                                            <input className="form-check-input" type="checkbox" value="catched" id={"check_" + pokemon.name} checked={catched.includes(pokemon.name)} onChange={() => onCatched(pokemon.name)} />
                                                             <label className="form-check-label" htmlFor={"check_" + pokemon.name}>
                                                                 {pokemon.name}
                                                             </label>
                                                             </div>
                                                         </div>
-                                                    </React.Fragment>
+                                                    </div>
                                     )
                                 }
                             </div>
@@ -189,15 +172,15 @@ class PokeManager extends Component {
                         </div>
                     </div>
                     <div className="col-md-8 row">
-                        {this.renderPokemonDetails()}
+                        {renderPokemonDetails()}
                     </div>
                 </div>
                 <footer className="navbar navbar-light bg-danger rounded-bottom row text-center">
                     <a className="navbar-brand" href="#">Pokedex</a>
                 </footer>
-            </React.Fragment>
+            </div>
         );
-    }
+    
 }
  
 export default PokeManager;
