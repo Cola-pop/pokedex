@@ -1,0 +1,14 @@
+/* Creates a new stacking context on the header */
+.header-element {
+    position: relative;
+}
+  
+  /* Positions header-content at the bottom of header's context */
+.bottom-content {
+    position: absolute;
+    bottom: 0;
+}
+
+.hand-cursor{
+  cursor: pointer; 
+}
