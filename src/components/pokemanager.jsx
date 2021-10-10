@@ -74,24 +74,6 @@ const PokeManager = () => {
     setTheFirstCatchedAsSelected();
   };
 
-  const resetList = function () {
-    fetch('https://pokeapi.co/api/v2/pokemon?limit=0&offset=0')
-    .then((res) => res.json())
-    .then((payload) => payload.count)
-    .then((count) => {
-      fetch('https://pokeapi.co/api/v2/pokemon?limit=' + count + '&offset=0')
-        .then((res) => res.json())
-        .then((payload) =>
-          fetch(payload.results[0].url)
-            .then((res2) => res2.json())
-            .then((pokemonDetails) => {
-              setPokemons(payload.results);
-              setSelectedPokemon(pokemonDetails);
-              setSelectedImgUrl(pokemonDetails.sprites.front_default);
-            })
-        );
-    });
-  };
 
   const setTheFirstCatchedAsSelected = function () {
     const checkPokemons = document.querySelectorAll('input:checked');
@@ -119,14 +101,13 @@ const PokeManager = () => {
   return (
     <div>
       <nav className='navbar navbar-light bg-danger rounded-top row'>
-        <a className='navbar-brand' href='#'>
+        <div className='navbar-brand' href='#'>
           <img
-            onClick={() => resetList()}
             href='#'
             src='https://icon-library.com/images/pokedex-icon/pokedex-icon-21.jpg'
             alt='Pokedex'
           />
-        </a>
+        </div>
       </nav>
       <nav className='row navbar navbar-light bg-danger'>
         <div className='col-md-7 row'>
