@@ -158,10 +158,7 @@ const PokeManager = () => {
                             checked={catched.includes(pokemon.name)}
                             onChange={() => onCatched(pokemon.name)}
                           />
-                          <label
-                            className='form-check-label'
-                            htmlFor={'check_' + pokemon.name}
-                          >
+                          <label className='form-check-label'>
                             {pokemon.name}
                           </label>
                         </div>
