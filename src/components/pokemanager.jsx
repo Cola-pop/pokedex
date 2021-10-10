@@ -42,17 +42,16 @@ const PokeManager = () => {
 
   const search = function () {
     const searchName = document.getElementById('search-field').value;
-    fetch('https://pokeapi.co/api/v2/pokemon/' + searchName)
-      .then((res) => res.json())
-      .then((payload) => {
-        const pokemons = [payload.forms[0]].map((form) => {
-          form.url = form.url.replace(/-form/, '');
-          return form;
+    if (searchName !== undefined && searchName.trim() !== "") {
+        fetch('https://pokeapi.co/api/v2/pokemon/' + searchName)
+        .then((res) => res.json())
+        .then((payload) => {
+            setSelectedPokemon(payload);
+            setSelectedImgUrl(payload.sprites.front_default);
+        }).then(() => {
+            document.getElementById("check_" + searchName).scrollIntoView();
         });
-        setPokemons(pokemons);
-        setSelectedPokemon(payload);
-        setSelectedImgUrl(payload.sprites.front_default);
-      });
+    }
   };
 
   const onCatched = function (name) {
@@ -161,7 +160,7 @@ const PokeManager = () => {
                 {pokemons
                   .filter((pokemon) => {
                     if (!onlyCatched) return true;
-                    return catched.indexOf(pokemon.name) != -1;
+                    return catched.indexOf(pokemon.name) !== -1;
                   })
                   .map((pokemon) => (
                     <div key={pokemon.name}>
