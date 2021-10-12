@@ -1,6 +1,3 @@
-HOMEMADE POKEDEX - per far girare il progetto in locale procedere come segue:
-clonare il rep sulla propria macchina, lanciare npm install, startare in locale. 
-
 COME FUNZIONA: Sulla sinistra la lista dei pokemon restituiti dall'api, a destra il dettaglio del pokemon selezionato (di default risulta selezionato il primo restituito). Dalla lista, la checkbox vicino ad ogni nome consente di spuntare il pokemon come catturato. Dall'input di ricerca in alto è possibile cercare uno specifico pokemon. Se la ricerca da esito positivo, il dettaglio del pokemon si visualizza nell'area dedicata e il nome appare come primo della lista a sinistra.  
 
 # Getting Started with Create React App
