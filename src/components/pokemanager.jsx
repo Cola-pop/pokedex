@@ -6,8 +6,7 @@ import '../component-styles/pokemanager.css';
 
 const PokeManager = () => {
   const [pokemons, setPokemons] = useState([]);
-  const [selectedPokemon, setSelectedPokemon] = useState({ abilities: [] });
-  const [selectedImgUrl, setSelectedImgUrl] = useState('');
+  const [selectedPokemon, setSelectedPokemon] = useState();
   const [catched, setCatched] = useState([]);
   const [onlyCatched, setOnlyCatched] = useState(false);
 
@@ -24,7 +23,6 @@ const PokeManager = () => {
               .then((pokemonDetails) => {
                 setPokemons(payload.results);
                 setSelectedPokemon(pokemonDetails);
-                setSelectedImgUrl(pokemonDetails.sprites.front_default);
               })
           );
       });
@@ -35,7 +33,6 @@ const PokeManager = () => {
       .then((res) => res.json())
       .then((payload) => {
         setSelectedPokemon(payload);
-        setSelectedImgUrl(payload.sprites.front_default);
       });
   };
 
@@ -47,7 +44,6 @@ const PokeManager = () => {
         .then((res) => res.json())
         .then((payload) => {
             setSelectedPokemon(payload);
-            setSelectedImgUrl(payload.sprites.front_default);
         }).then(() => {
             document.getElementById("check_" + searchName).scrollIntoView();
         });
@@ -86,9 +82,6 @@ const PokeManager = () => {
     if (!onlyCatched || catched.includes(selectedPokemon.forms[0].name))
       return (
         <div>
-          <div className='col-md-12'>
-            <img alt='poke_front' src={selectedImgUrl} />
-          </div>
           <div className='col-md-12'>
             <PokemonDetails selectedPokemon={selectedPokemon} />
           </div>
